@@ -70,7 +70,7 @@ A guide on how to create an API using node.js and postgresql
   6. Create a new configuration file within the bin folder by running `touch bin/configuredb.sh`
   7. Add the following code to the configuredb.sh file:
   
-    ```sh
+    ```
     #!/bin/bash
     
     database="monstersdb"
