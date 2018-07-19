@@ -60,8 +60,8 @@ A guide on how to create an API using node.js and postgresql
   ```
   
   ## Node SQL Configuration
-  1. In your terminal, run `createdb -U <User> monstersdb`
-  2. Launch the interactive postgres shell by using the followig command `psql -U <User> monstersdb`
+  1. In your terminal, run `createdb -U node_user monstersdb`
+  2. Launch the interactive postgres shell by using the followig command `psql -U node_user monstersdb`
   3. Enter `CREATE USER node_user WITH SUPERUSER PASSWORD '<Password>';`
     1. This creates a new role in the database
     2. To confirm it exists, run `SELECT * FROM pg_user;`
@@ -81,7 +81,7 @@ A guide on how to create an API using node.js and postgresql
     
     psql -U node_user monstersdb < ./bin/sql/monsters.sql
     
-    echo "database configured"
+    echo "$database configured"
     
     ```
  8. Let's organize our files so the above configure file actually works

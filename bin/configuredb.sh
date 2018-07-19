@@ -8,4 +8,4 @@ createdb -U node_user monstersdb
 
 psql -U node_user monstersdb < ./bin/sql/monsters.sql
 
-echo "database configured"
+echo "$database configured"
