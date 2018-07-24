@@ -125,7 +125,7 @@ A guide on how to create an API using node.js and postgresql
     console.log(res);
   });
   ```
-    - To test this file, run `node db` in your terminal
+  - To test this file, run `node db` in your terminal
 3. To protect some of this data, lets create a new folder called `secrets`
 4. Within the `secrets` folder, create a file called `db_configuration.js` and add the following code:
   ```javascript
@@ -156,4 +156,4 @@ A guide on how to create an API using node.js and postgresql
   secrets/
   package-lock.json
   ```
-6. Run `node db` in your terminal to confirm everything still works
+7. Run `node db` in your terminal to confirm everything still works
