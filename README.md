@@ -59,7 +59,7 @@ A guide on how to create an API using node.js and postgresql
   ('Zombie', 'Basement');
   ```
   
-  ## Node SQL Configuration
+## Node SQL Configuration
   1. In your terminal, run `createdb -U node_user monstersdb`
   2. Launch the interactive postgres shell by using the followig command `psql -U node_user monstersdb`
   3. Enter `CREATE USER node_user WITH SUPERUSER PASSWORD '<Password>';`
@@ -103,3 +103,57 @@ A guide on how to create an API using node.js and postgresql
       1. By now, you data should have been inserted into the database. To confirm, go into the psql shell by running `psql -U node_user monstersdb`
       2. In the shell, run `\d`
           - You should see the newly created tables!
+
+## Configure the Postgress Pool
+1. Create a new folder in the main directory called `db`
+2. In the `db` folder, create a `index.js` file with the following code:
+
+  ```javascript
+  const { Pool } = require('pg');
+  
+  const pool = new Pool({
+    user: 'node_user',
+    host: 'localhost',
+    database: 'monstersdb',
+    password: '<Your Password>',
+    port: 5432
+  });
+  
+  pool.query('SELECT * FROM monsters', (err, res) => {
+    if (err) return console.log(err);
+    
+    console.log(res);
+  });
+  ```
+    - To test this file, run `node db` in your terminal
+3. To protect some of this data, lets create a new folder called `secrets`
+4. Within the `secrets` folder, create a file called `db_configuration.js` and add the following code:
+  ```javascript
+  module.exports = {
+     host: 'localhost',
+     database: 'monstersdb',
+     password: '<Your Password>',
+     port: 5432
+  };
+  ```
+5. Go back into the `db/index.js` file and modidy the code like so:
+
+  ```javascript
+  const { Pool } = require('pg');
+  const { user, host, database, password, port } = require('../secrets/db_configuration')
+
+  const pool = new Pool({user, host, database, password, port});
+
+  pool.query('SELECT * FROM monsters', (err, res) => {
+    if (err) return console.log(err);
+    
+    console.log(res);
+  });
+  ```
+6. If you're using [git](https://git-scm.com/) as your version control system, create a `.gitignore` file in the main directory and add the following code:
+
+  ```
+  secrets/
+  package-lock.json
+  ```
+6. Run `node db` in your terminal to confirm everything still works
