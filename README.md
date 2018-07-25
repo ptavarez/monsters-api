@@ -157,3 +157,128 @@ A guide on how to create an API using node.js and postgresql
   package-lock.json
   ```
 7. Run `node db` in your terminal to confirm everything still works
+
+## Monsters GET Request with Express
+1. In the route of the application, create a `app.js` file and add the following code:
+  
+  ```javascript
+  const express = require('express');
+  
+  const app = express();
+  
+  app.get('/monsters', (request, response) => {
+    
+  });
+  ```
+2. Go into the `db/index.js` file to export the pool instance and cut the query code out:
+
+  ```javascript
+  const { Pool } = require('pg');
+  const { user, host, database, password, port } = require('../secrets/db_configuration');
+
+  const pool = new Pool({user, host, database, password, port});
+
+  module.exports = pool;
+  ```
+3. Return to the `app.js` file to require the pool instance and paste the query code like so:
+
+  ```javascript
+  const express = require('express');
+  const pool = require('./db');
+  
+  const app = express();
+  
+  app.get('/monsters', (request, response) => {
+    pool.query('SELECT * FROM monsters', (err, res) => {
+      if (err) return console.log(err);
+      
+      console.log(res);
+    });
+  });
+  ```
+4. To run the server, lets add some code to the `app.js` file:
+
+  ```javascript
+  const express = require('express');
+  const pool = require('./db');
+  
+  const app = express();
+  
+  app.get('/monsters', (request, response) => {
+    pool.query('SELECT * FROM monsters', (err, res) => {
+      if (err) return console.log(err);
+      
+      console.log(res.rows);
+    });
+  });
+  
+  const port = 3000;
+  
+  app.listen(port, () =>  console.log(`listening on port ${port}`));
+  ```
+5. Confirm these modifications work:
+    1. In your terminal, run `node app`
+    2. In your browser, head over to `http://localhost:3000/monsters`
+    3. Return to your terminal and you should see the monsters table!
+6. In the `bin` folder, create a new file called `www` with the following code:
+
+    ```
+    #!/user/bin/env node
+    
+    const app = require('../app');
+    
+    const port = 3000;
+    
+    app.listen(port, () =>  console.log(`listening on port ${port}`));
+    
+    ```
+    
+7. Within `app.js`, make the following modifications:
+
+  ```javascript
+  const express = require('express');
+  const pool = require('./db');
+
+  const app = express();
+
+  app.get('/monsters', (request, response) => {
+    pool.query('SELECT * FROM monsters', (err, res) => {
+      if (err) return console.log(err);
+      
+      console.log(res.rows);
+    });
+  });
+
+  module.exports = app;
+  ```
+8. Within the `package.json` file, lets add new commands within the scripts object:
+
+  ```javascript
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "configure": "./bin/configuredb.sh",
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  ```
+9. Confirm these modifications work:
+    1. In your terminal, run `npm run dev`
+    2. In your browser, head over to `http://localhost:3000/monsters`
+    3. Return to your terminal and you should see the monsters table!
+10. Return to the `app.js` file and make the following changes:
+  ```javascript
+  const express = require('express');
+  const pool = require('./db');
+
+  const app = express();
+
+  app.get('/monsters', (request, response) => {
+    pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+      if (err) return console.log(err);
+      
+      response.json(res.rows);
+    });
+  });
+
+  module.exports = app;
+  ```
