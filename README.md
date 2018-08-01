@@ -282,3 +282,27 @@ A guide on how to create an API using node.js and postgresql
 
   module.exports = app;
   ```
+  
+  ## Error Handling with Middleware
+  1. To add error handling to the get request, modify the `app.js` file like so:
+    ```javascript
+    const express = require('express');
+    const pool = require('./db');
+
+    const app = express();
+
+    app.get('/monsters', (request, response, next) => {
+      pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+        if (err) return next(err);
+        
+        response.json(res.rows);
+      });
+    });
+    
+    app.use((err, req, res, next) => {
+      res.json(err);
+    });
+    
+    module.exports = app;
+    ```
+  
