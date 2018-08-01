@@ -283,7 +283,7 @@ A guide on how to create an API using node.js and postgresql
   module.exports = app;
   ```
   
-  ## Error Handling with Middleware
+  ### Error Handling with Middleware
   1. To add error handling to the get request, modify the `app.js` file like so:
   
         ```javascript
