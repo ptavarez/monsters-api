@@ -340,50 +340,50 @@ A guide on how to create an API using node.js and postgresql
     module.exports = app;
     ```
     
-    ### Express Routes
-    1. In the root of the project, create a new folder called `routes`
-    2. Add a `monsters.js` file with the following code
-    
-      ```javascript
-      const { Router } = require('express');
-      const pool = require('../db');
-      
-      const router = Router();
-      
-      router.get('/', (request, response, next) => {
-        pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
-          if (err) return next(err);
-          
-          response.json(res.rows);
-        });
-      });
+### Express Routes
+1. In the root of the project, create a new folder called `routes`
+2. Add a `monsters.js` file with the following code
 
-      router.get('/:id', (request, response, next) => {
-        const { id } = request.params;
-        
-        pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
-          if (err) return next(err);
-          
-          response.json(res.rows);
-        });
-      });
-      
-      module.exports = router;
-      ```
-    3. In the `app.js` file, modify it so it looks like so:
+  ```javascript
+  const { Router } = require('express');
+  const pool = require('../db');
 
-        ```javascript
-        const express = require('express');
-        const monsters = require('./routes/monsters')
+  const router = Router();
 
-        const app = express();
-        
-        app.use('/monsters', monsters);
-        
-        app.use((err, req, res, next) => {
-          res.json(err);
-        });
+  router.get('/', (request, response, next) => {
+    pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+      if (err) return next(err);
 
-        module.exports = app;
-        ```
+      response.json(res.rows);
+    });
+  });
+
+  router.get('/:id', (request, response, next) => {
+    const { id } = request.params;
+
+    pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
+      if (err) return next(err);
+
+      response.json(res.rows);
+    });
+  });
+
+  module.exports = router;
+  ```
+3. In the `app.js` file, modify it so it looks like so:
+
+    ```javascript
+    const express = require('express');
+    const monsters = require('./routes/monsters')
+
+    const app = express();
+
+    app.use('/monsters', monsters);
+
+    app.use((err, req, res, next) => {
+      res.json(err);
+    });
+
+    module.exports = app;
+    ```
     
