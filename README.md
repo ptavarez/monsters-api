@@ -159,7 +159,7 @@ A guide on how to create an API using node.js and postgresql
 7. Run `node db` in your terminal to confirm everything still works
 
 ## Monsters GET Request with Express
-1. In the route of the application, create a `app.js` file and add the following code:
+1. In the root of the application, create a `app.js` file and add the following code:
   
   ```javascript
   const express = require('express');
@@ -306,4 +306,84 @@ A guide on how to create an API using node.js and postgresql
 
         module.exports = app;
         ```
-  
+
+## Get By ID
+1. To get a monster by ID, modify the app.js file as follows:
+    ```javascript
+    const express = require('express');
+    const pool = require('./db');
+
+    const app = express();
+
+    app.get('/monsters', (request, response, next) => {
+      pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+        if (err) return next(err);
+
+        response.json(res.rows);
+      });
+    });
+    
+    app.get('/monsters/:id', (request, response, next) => {
+      const { id } = request.params;
+      
+      pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
+        if (err) return next(err);
+
+        response.json(res.rows);
+      });
+    });
+
+    app.use((err, req, res, next) => {
+      res.json(err);
+    });
+
+    module.exports = app;
+    ```
+    
+    ### Express Routes
+    1. In the root of the project, create a new folder called `routes`
+    2. Add a `monsters.js` file with the following code
+    
+      ```javascript
+      const { Router } = require('express');
+      const pool = require('../db');
+      
+      const router = Router();
+      
+      router.get('/', (request, response, next) => {
+        pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+          if (err) return next(err);
+          
+          response.json(res.rows);
+        });
+      });
+
+      router.get('/:id', (request, response, next) => {
+        const { id } = request.params;
+        
+        pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
+          if (err) return next(err);
+          
+          response.json(res.rows);
+        });
+      });
+      
+      module.exports = router;
+      ```
+    3. In the `app.js` file, modify it so it looks like so:
+
+        ```javascript
+        const express = require('express');
+        const monsters = require('./routes/monsters')
+
+        const app = express();
+        
+        app.use('/monsters', monsters);
+        
+        app.use((err, req, res, next) => {
+          res.json(err);
+        });
+
+        module.exports = app;
+        ```
+    
