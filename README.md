@@ -344,32 +344,32 @@ A guide on how to create an API using node.js and postgresql
 1. In the root of the project, create a new folder called `routes`
 2. Add a `monsters.js` file with the following code
 
-  ```javascript
-  const { Router } = require('express');
-  const pool = require('../db');
+    ```javascript
+    const { Router } = require('express');
+    const pool = require('../db');
 
-  const router = Router();
+    const router = Router();
 
-  router.get('/', (request, response, next) => {
-    pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
-      if (err) return next(err);
+    router.get('/', (request, response, next) => {
+      pool.query('SELECT * FROM monsters ORDER BY id ASC', (err, res) => {
+        if (err) return next(err);
 
-      response.json(res.rows);
+        response.json(res.rows);
+      });
     });
-  });
 
-  router.get('/:id', (request, response, next) => {
-    const { id } = request.params;
+    router.get('/:id', (request, response, next) => {
+      const { id } = request.params;
 
-    pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
-      if (err) return next(err);
+      pool.query('SELECT * FROM monsters WHERE id = $1', [id], (err, res) => {
+        if (err) return next(err);
 
-      response.json(res.rows);
+        response.json(res.rows);
+      });
     });
-  });
 
-  module.exports = router;
-  ```
+    module.exports = router;
+    ```
 3. In the `app.js` file, modify it so it looks like so:
 
     ```javascript
@@ -386,4 +386,45 @@ A guide on how to create an API using node.js and postgresql
 
     module.exports = app;
     ```
+
+## Monsters Post Method
+1. To be able to add new data into the database, add the following code to the `routes/monsters.js` file:
+
+  ```javascript
+  // Previous code above
+  
+  router.post('/', (request, response, next) => {
+    const { name, personality } = request.body;
     
+    pool.query(
+      'INSERT INTO monsters(name, personality) VALUES($1, $2)',
+      [name, personality],
+      (err, res) => {
+        if (err) return next(err);
+        
+        response.redirect('/monsters');
+      }
+    );
+  });
+
+  module.exports = router;
+  ```
+2. In the `app.js` file, add the following modifications:
+
+  ```javascript
+  const express = require('express');
+  const bodyParser = require('body-parser');
+  const monsters = require('./routes/monsters')
+
+  const app = express();
+
+  app.use(bodyParser.json());
+  
+  app.use('/monsters', monsters);
+
+  app.use((err, req, res, next) => {
+    res.json(err);
+  });
+
+  module.exports = app;
+  ```
