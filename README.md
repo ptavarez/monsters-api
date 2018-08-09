@@ -391,8 +391,7 @@ A guide on how to create an API using node.js and postgresql
 1. To be able to add new data into the database, add the following code to the `routes/monsters.js` file:
 
   ```javascript
-  // Previous code above
-  
+  // Previous Code
   router.post('/', (request, response, next) => {
     const { name, personality } = request.body;
     
@@ -427,4 +426,38 @@ A guide on how to create an API using node.js and postgresql
   });
 
   module.exports = app;
+  ```
+
+## Monsters Put Method
+1. To update a monster, add the following code to the `routes/monsters.js` file:
+
+  ```javascript
+  // Previous Code
+  router.put('/:id', (request, response, next) => {
+    const { id } = request.params;
+    
+    const { name, personality } = request.body;
+    
+    const keys = ['name', 'personality'];
+    
+    const fields = [];
+    
+    keys.forEach(key => {
+      if (request.body[key]) fields.push(key)
+    });
+    
+    fields.forEach((field, index) => {
+        pool.query(
+          `UPDATE monsters SET ${field}=($1) WHERE id=($2)`,
+          [request.body[field], id],
+          (err, res) => {
+            if (err) return next(err)
+          
+            if (index === fields.length - 1) response.redirect('/monsters/' + id);
+          }
+        );
+      });
+    });
+  
+  module.exports = router;
   ```
