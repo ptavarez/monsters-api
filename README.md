@@ -523,3 +523,84 @@ A guide on how to create an API using node.js and postgresql
   app.use('/habitats', habitats);
   // Following Code
   ```
+## Relationship
+1. To use the lives table, begin by creating a new file in the routes directory called `lives.js` and add the followinge code
+
+  ```javascript
+  const { Router } = require('express');
+  const pool = require('../db');
+
+  const router = Router();
+
+  router.get('/', (request, response, next) => {
+    pool.query('SELECT * FROM lives', (err, res) => {
+      if (err) return next(err);
+
+      response.json(res.rows);
+    });
+  });
+
+  router.get('/conditions', (request, response, next) => {
+    pool.query(
+      'SELECT * FROM lives JOIN habitats ON habitats.name = lives.habitat',
+      (err, res) => {
+        if (err) return next(err);
+
+        response.json(res.rows)
+      });
+  });
+
+  module.exports = router;
+  ```
+2. In the `app.js` file, add the following code:
+  ```javascript
+    // Previous Code
+  const lives = require('./routes/lives');
+
+  const app = express();
+
+  app.use(bodyParser.json());
+
+  app.use('/monsters', monsters);
+
+  app.use('/habitats', habitats);
+
+  app.use('/lives', lives);
+  // Following Code
+  ```
+### Clean Up
+1. In the `routes` folder, create a new file called `index.js` file with the following code:
+
+  ```javascript
+  const { Router } = require('express');
+  const monsters = require('./monsters');
+  const habitats = require('./habitats');
+  const lives = require('./lives');
+
+  const router = Router();
+
+  router.use('/monsters', monsters);
+  router.use('/habitats', habitats);
+  router.use('/lives', lives);
+
+  module.exports = router;
+  ```
+2. In the `app.js` file, make the following modifications:
+
+  ```javascript
+  const express = require('express');
+  const bodyParser = require('body-parser');
+  const routes = require('./routes')
+
+  const app = express();
+
+  app.use(bodyParser.json());
+
+  app.use('/', routes);
+
+  app.use((err, req, res, next) => {
+    res.json(err);
+  });
+
+  module.exports = app;
+  ```
