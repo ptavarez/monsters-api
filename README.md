@@ -435,11 +435,7 @@ A guide on how to create an API using node.js and postgresql
   // Previous Code
   router.put('/:id', (request, response, next) => {
     const { id } = request.params;
-    
-    const { name, personality } = request.body;
-    
     const keys = ['name', 'personality'];
-    
     const fields = [];
     
     keys.forEach(key => {
@@ -459,5 +455,23 @@ A guide on how to create an API using node.js and postgresql
       });
     });
   
+  module.exports = router;
+  ```
+  
+## Monsters Delete Method
+1. To delete a monster, add the following code to the `routes/monsters.js` file:
+
+  ```javascript
+  // Previous Code
+  router.delete('/:id', (request, response, next) => {
+    const { id } = request.params;
+
+    pool.query('DELETE FROM monsters WHERE id=($1)', [id], (err, res) =>{
+      if (err) return next(err);
+
+      response.redirect('/monsters');
+    });
+  });
+
   module.exports = router;
   ```
