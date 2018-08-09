@@ -475,3 +475,51 @@ A guide on how to create an API using node.js and postgresql
 
   module.exports = router;
   ```
+## Habitats Get and Post Methods
+1. To begin using the habitats table, create a new file in the `routes` folder called `habitats.js`
+2. In the `habitats.js`, add the following code: 
+
+  ```javascript
+  const { Router } = require('express');
+  const pool = require('../db');
+
+  const router = Router();
+
+  router.get('/', (request, response, next) => {
+      pool.query('SELECT * FROM habitats ORDER BY id ASC', (err, res) => {
+        if (err) return next(err);
+        
+        response.json(res.rows);
+      });
+  });
+
+  router.post('/', (request, response, next) => {
+      const { name, climate, temperatue } = request.body;
+
+      pool.query(
+        'INSERT INTO habitats(name, climate, temperatue) VALUES($1, $2, $3)', 
+        [name, climate, temperatue],
+        (err, res) => {
+        if (err) return next(err);
+        
+        response.redirect('/habitats');
+      });
+  });
+
+  module.exports = router;
+  ```
+3. In the `app.js` file, add the following modifications:
+
+  ```javascript
+  // Previous Code
+  const habitats = require('./routes/habitats');
+
+  const app = express();
+
+  app.use(bodyParser.json());
+
+  app.use('/monsters', monsters);
+
+  app.use('/habitats', habitats);
+  // Following Code
+  ```
